@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">MovieReleases</string>
     <string name="action_settings">Settings</string>
-    <string name="api_key">e44c865c1d655b3e5c249dc8f447c364</string>
+    <string name="api_key">Enter api key here!</string>
 
     <string name="pref_sort_label">Sort Movies By</string>
     <string name="pref_popular_label">Popularity</string>
