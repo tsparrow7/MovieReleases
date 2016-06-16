@@ -26,8 +26,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import butterknife.ButterKnife;
-
 
 /**
  * A placeholder fragment containing a simple view.
@@ -67,10 +65,12 @@ public class MovieFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
     }
 
-    public String getPosterPathFromJson(String movieId){
+    public String getPoster(String movieId){
 
         String posterUrl ="";
 
@@ -150,7 +150,7 @@ public class MovieFragment extends Fragment {
                     Movie movie = new Movie(movieId, poster);
                     movieId = movieIdList.get(i);
                     movie.setMovieId(movieId);
-                    poster = getPosterPathFromJson(movie.getMovieId());
+                    poster = getPoster(movie.getMovieId());
                     movie.setMoviePosterUrl(poster);
                     posterUrlList.add(movie.getMoviePosterUrl());
                 }
@@ -162,7 +162,6 @@ public class MovieFragment extends Fragment {
 
                 Bundle args = new Bundle();
                 args.putString("movieId", movie);
-                args.putString("status", "online");
                 MovieFragment movieFragment = new MovieFragment();
                 movieFragment.setArguments(args);
 
@@ -178,7 +177,6 @@ public class MovieFragment extends Fragment {
 
                         detailsIntent = new Intent(getActivity(), null ); /*DetailActivity.class)*/
                         detailsIntent.putExtra("MOVIEID", movie);
-                        detailsIntent.putExtra("STATUS", "online");
                         startActivity(detailsIntent);
 
                     }
@@ -207,8 +205,6 @@ public class MovieFragment extends Fragment {
         View v = inflater.inflate(R.layout.movies_grid_view, container, false);
         mGridView = (GridView) v.findViewById(R.id.grid_view);
         mKey = getString(R.string.api_key);
-
-        ButterKnife.bind(getActivity());
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sortPref = sharedPreferences.getString(getString(R.string.pref_sort_key),getString(R.string.pref_sort_popular));
