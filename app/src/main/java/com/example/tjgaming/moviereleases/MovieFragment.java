@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,6 +84,7 @@ public class MovieFragment extends Fragment {
             builder.appendPath(movieId);
             builder.appendQueryParameter(API_KEY_PARAM, mKey);
             String myUrl = builder.build().toString();
+            Log.i("URL", myUrl);
 
             if(NetworkChecker.isNetworkActive(getActivity())){
 
@@ -175,7 +177,7 @@ public class MovieFragment extends Fragment {
 
                         //Start a new intent launching the detailActivity class
 
-                        detailsIntent = new Intent(getActivity(), null ); /*DetailActivity.class)*/
+                        detailsIntent = new Intent(getActivity(), DetailActivity.class);
                         detailsIntent.putExtra("MOVIEID", movie);
                         startActivity(detailsIntent);
 
