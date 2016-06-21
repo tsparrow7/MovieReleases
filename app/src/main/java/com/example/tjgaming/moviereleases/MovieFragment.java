@@ -38,6 +38,7 @@ public class MovieFragment extends Fragment {
     private ArrayList<String> movieIdList = new ArrayList<String>();
     private ArrayList<String> posterUrlList = new ArrayList<String>();
 
+    //Id of the movie from the API and the path of the poster picture.
     private String movieId = null;
     private String poster = null;
 

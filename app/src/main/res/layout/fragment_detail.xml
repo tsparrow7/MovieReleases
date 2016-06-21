@@ -7,4 +7,84 @@
     tools:context="com.example.tjgaming.moviereleases.DetailFragment"
     android:id="@+id/movie_detail_container">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="40dp"
+            android:paddingBottom="40dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/poster_image"
+                android:elevation="5dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:padding="5dp"
+                android:paddingBottom="20dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/movie_title"
+                android:gravity="center"
+                android:textSize="25sp"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                android:padding="5dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/movie_release_date"
+                android:gravity="center"
+                android:textSize="15sp"
+                android:padding="5dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/movie_overview"
+                android:gravity="center"
+                android:textSize="15sp"
+                android:padding="5dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/movie_rating"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:padding="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/movie_trailer_link"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:padding="5dp"
+                android:clickable="true"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/colorAccent"
+                android:elevation="10dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/movie_review"
+                android:gravity="center"
+                android:textSize="15sp"
+                android:padding="5dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
 </FrameLayout>

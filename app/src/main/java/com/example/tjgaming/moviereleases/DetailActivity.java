@@ -6,7 +6,11 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -51,12 +55,16 @@ public class DetailActivity extends AppCompatActivity {
         final String BASE_JSON_REQUEST = "api.themoviedb.org";
         final String JSON_REQUEST_PARAM = "3";
         final String MOVIE_JSON_REQUEST = "movie";
-        final String REVIEW_JSON_RQUEST = "reviews";
+        final String REVIEW_JSON_REQUEST = "reviews";
         final String TRAILER_JSON_REQUEST = "videos";
+
+        //For youtube url
         final String YOUTUBE_BASE_URL = "www.youtube.com";
         final String YOUTUBE_WATCH_PARAM = "watch";
         final String YOUTUBE_VIDEO_ID_QUERY_PARAM = "v";
-        final String BASE_POSTER_URL = "http://image.tmdb.rg/t/p/";
+
+        //For poster image
+        final String BASE_POSTER_URL = "http://image.tmdb.org/t/p/";
         final String POSTER_SIZE_PARAM = "w370";
 
         //Data to retrieve from the movie API url
@@ -82,29 +90,7 @@ public class DetailActivity extends AppCompatActivity {
         private ImageView poster;
         private TextView movieTrailerTextView;
 
-        public void DetailsFragment() {
-
-        }
-
-        //assigns data to the textViews
-        public void setTextViews() {
-
-            movieTitleTextView.setText(movieTitle);
-
-            movieReleaseDateTextView.setText(
-                    "Release Date: " + movieReleaseDate);
-
-            movieRatingTextView.setText(
-                    "Rating: " + movieRating + "/10");
-
-            movieOverviewTextView.setText(
-                    "Overview: " + movieOverview);
-
-            movieReviewTextView.setText(movieReview);
-
-            movieTrailerTextView.setText("Play Movie Preview");
-
-        }
+        public void DetailsFragment() {}
 
         public void getMovieReview(String url) {
 
@@ -190,23 +176,25 @@ public class DetailActivity extends AppCompatActivity {
                 trailerBuilder.scheme("https");
                 trailerBuilder.authority(BASE_JSON_REQUEST);
                 trailerBuilder.appendPath(JSON_REQUEST_PARAM);
+                trailerBuilder.appendPath(MOVIE_JSON_REQUEST);
                 trailerBuilder.appendPath(movieId);
                 trailerBuilder.appendPath(TRAILER_JSON_REQUEST);
                 trailerBuilder.appendQueryParameter(API_KEY_PARAM, myKey);
 
-                movieTrailerUrl = builder.build().toString();
-
+                movieTrailerUrl = trailerBuilder.build().toString();
+                Log.i("movieTrailerUrl: ",movieTrailerUrl);
                 //Review Url
                 Uri.Builder reviewBuilder = new Uri.Builder();
                 reviewBuilder.scheme("https");
                 reviewBuilder.authority(BASE_JSON_REQUEST);
                 reviewBuilder.appendPath(JSON_REQUEST_PARAM);
+                reviewBuilder.appendPath(MOVIE_JSON_REQUEST);
                 reviewBuilder.appendPath(movieId);
-                reviewBuilder.appendPath(REVIEW_JSON_RQUEST);
+                reviewBuilder.appendPath(REVIEW_JSON_REQUEST);
                 reviewBuilder.appendQueryParameter(API_KEY_PARAM, myKey);
 
                 movieReviewUrl = reviewBuilder.build().toString();
-
+                Log.i("movieREviewUrl: ", movieReviewUrl);
                 try {
 
                     GetMovieTask movieTask = new GetMovieTask();
@@ -231,9 +219,9 @@ public class DetailActivity extends AppCompatActivity {
 
                 movieReview = movieContent + "\nWritten by: " + movieAuthor;
 
-                Picasso.with(getContext())
-                        .load(BASE_POSTER_URL+POSTER_SIZE_PARAM+moviePoster)
-                        .into(poster);
+                //set the poster for the movie
+                loadPosterImage();
+
 
                 //Set data for the textViews
                 setTextViews();
@@ -263,6 +251,26 @@ public class DetailActivity extends AppCompatActivity {
 
         }
 
+        //assigns data to the textViews
+        public void setTextViews() {
+
+            movieTitleTextView.setText(movieTitle);
+
+            movieReleaseDateTextView.setText(
+                    "Release Date: " + movieReleaseDate);
+
+            movieRatingTextView.setText(
+                    "Rating: " + movieRating + "/10");
+
+            movieOverviewTextView.setText(
+                    "Overview: " + movieOverview);
+
+            movieReviewTextView.setText(movieReview);
+
+            movieTrailerTextView.setText("Watch Trailer");
+
+        }
+
         public void launchYoutubeIntent(String url) {
 
             Intent youtubeIntent = new Intent(Intent.ACTION_VIEW);
@@ -275,5 +283,85 @@ public class DetailActivity extends AppCompatActivity {
             }
 
         }
+
+        public void loadPosterImage() {
+
+            Picasso.with(getContext())
+                    .load(BASE_POSTER_URL+POSTER_SIZE_PARAM+moviePoster)
+                    .into(poster);
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+
+            super.onCreate(savedInstanceState);
+
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+
+            View view = inflater.inflate(R.layout.fragment_detail, container, false);
+
+            movieTitleTextView = (TextView) view.findViewById(R.id.movie_title);
+            movieReleaseDateTextView = (TextView)view.findViewById(R.id.movie_release_date);
+            movieOverviewTextView = (TextView)view.findViewById(R.id.movie_overview);
+            movieRatingTextView = (TextView)view.findViewById(R.id.movie_rating);
+            movieTrailerTextView = (TextView)view.findViewById(R.id.movie_trailer_link);
+            poster = (ImageView)view.findViewById(R.id.poster_image);
+            movieReviewTextView = (TextView)view.findViewById(R.id.movie_review);
+
+            Log.i("textView text",movieTitleTextView.getText().toString());
+
+            myKey = getString(R.string.api_key);
+
+            Intent intent = getActivity().getIntent();
+            Bundle arguments = getArguments();
+
+            if (arguments != null) {
+                movieId = arguments.getString("MOVIEID");
+                Log.i("movieId: ", movieId);
+            }
+            else if (arguments == null) {
+
+                try {
+
+                    movieId = intent.getStringExtra("MOVIEID");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            setDetailView();
+
+            setHasOptionsMenu(true);
+
+            return view;
+        }
+
+        @Override
+//        public boolean onCreateOptionsMenu(Menu menu) {
+//            super.onCreateOptionsMenu(menu, getMenuInflater());
+//            return true;
+//        }
+
+        public boolean onOptionsItemSelected(MenuItem item) {
+            // Handle action bar item clicks here. The action bar will
+            // automatically handle clicks on the Home/Up button, so long
+            // as you specify a parent activity in AndroidManifest.xml.
+            int id = item.getItemId();
+
+            //noinspection SimplifiableIfStatement
+            if (id == R.id.action_settings) {
+
+//                Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
+//                startActivity(i);
+                return false;
+            }
+
+            return super.onOptionsItemSelected(item);
+        }
+
+
     }
 }
