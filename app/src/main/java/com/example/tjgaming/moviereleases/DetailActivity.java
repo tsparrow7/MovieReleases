@@ -6,8 +6,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,12 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
+
+        try {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }catch (NullPointerException e) {
+            e.printStackTrace();
+        }
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -92,6 +98,28 @@ public class DetailActivity extends AppCompatActivity {
 
         public void DetailsFragment() {}
 
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            super.onCreateOptionsMenu(menu, inflater);
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            // Handle action bar item clicks here. The action bar will
+            // automatically handle clicks on the Home/Up button, so long
+            // as you specify a parent activity in AndroidManifest.xml.
+            int id = item.getItemId();
+
+            //noinspection SimplifiableIfStatement
+            if (id == R.id.action_settings) {
+
+                return false;
+            }
+
+            return super.onOptionsItemSelected(item);
+        }
+
+
         public void getMovieReview(String url) {
 
             //Network Check
@@ -121,7 +149,6 @@ public class DetailActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-
         }
 
         public void getMovieTrailer(String url) {
@@ -150,9 +177,7 @@ public class DetailActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
-
         }
 
         public void setDetailView() {
@@ -160,41 +185,12 @@ public class DetailActivity extends AppCompatActivity {
             //Network Check
             if (NetworkChecker.isNetworkActive(getActivity())) {
 
-                //Base Url
-                Uri.Builder builder = new Uri.Builder();
-                builder.scheme("https");
-                builder.authority(BASE_JSON_REQUEST);
-                builder.appendPath(JSON_REQUEST_PARAM);
-                builder.appendPath(MOVIE_JSON_REQUEST);
-                builder.appendPath(movieId);
-                builder.appendQueryParameter(API_KEY_PARAM, myKey);
+                String baseUrl = buildUrl("Base");
 
-                String baseUrl = builder.build().toString();
+                movieTrailerUrl = buildUrl("Trailer");
 
-                //Trailer Url
-                Uri.Builder trailerBuilder = new Uri.Builder();
-                trailerBuilder.scheme("https");
-                trailerBuilder.authority(BASE_JSON_REQUEST);
-                trailerBuilder.appendPath(JSON_REQUEST_PARAM);
-                trailerBuilder.appendPath(MOVIE_JSON_REQUEST);
-                trailerBuilder.appendPath(movieId);
-                trailerBuilder.appendPath(TRAILER_JSON_REQUEST);
-                trailerBuilder.appendQueryParameter(API_KEY_PARAM, myKey);
+                movieReviewUrl = buildUrl("Review");
 
-                movieTrailerUrl = trailerBuilder.build().toString();
-                Log.i("movieTrailerUrl: ",movieTrailerUrl);
-                //Review Url
-                Uri.Builder reviewBuilder = new Uri.Builder();
-                reviewBuilder.scheme("https");
-                reviewBuilder.authority(BASE_JSON_REQUEST);
-                reviewBuilder.appendPath(JSON_REQUEST_PARAM);
-                reviewBuilder.appendPath(MOVIE_JSON_REQUEST);
-                reviewBuilder.appendPath(movieId);
-                reviewBuilder.appendPath(REVIEW_JSON_REQUEST);
-                reviewBuilder.appendQueryParameter(API_KEY_PARAM, myKey);
-
-                movieReviewUrl = reviewBuilder.build().toString();
-                Log.i("movieREviewUrl: ", movieReviewUrl);
                 try {
 
                     GetMovieTask movieTask = new GetMovieTask();
@@ -222,7 +218,6 @@ public class DetailActivity extends AppCompatActivity {
                 //set the poster for the movie
                 loadPosterImage();
 
-
                 //Set data for the textViews
                 setTextViews();
 
@@ -246,9 +241,37 @@ public class DetailActivity extends AppCompatActivity {
                         launchYoutubeIntent(youtubeUrl);
                     }
                 });
+            }
+        }
 
+        //Builds Url based on type of data needed to receive
+        public String buildUrl(String typeOfUrl) {
+
+            Uri.Builder builder = new Uri.Builder();
+            builder.scheme("https");
+            builder.authority(BASE_JSON_REQUEST);
+            builder.appendPath(JSON_REQUEST_PARAM);
+            builder.appendPath(MOVIE_JSON_REQUEST);
+            builder.appendPath(movieId);
+
+            if (typeOfUrl.equalsIgnoreCase("Base")) {
+
+                builder.appendQueryParameter(API_KEY_PARAM, myKey);
+                return builder.build().toString();
+            } else if (typeOfUrl.equalsIgnoreCase("Trailer")) {
+
+                builder.appendPath(TRAILER_JSON_REQUEST);
+                builder.appendQueryParameter(API_KEY_PARAM, myKey);
+                return builder.build().toString();
+
+            } else if (typeOfUrl.equalsIgnoreCase("Review")) {
+
+                builder.appendPath(REVIEW_JSON_REQUEST);
+                builder.appendQueryParameter(API_KEY_PARAM, myKey);
+                return builder.build().toString();
             }
 
+            return null;
         }
 
         //assigns data to the textViews
@@ -268,20 +291,15 @@ public class DetailActivity extends AppCompatActivity {
             movieReviewTextView.setText(movieReview);
 
             movieTrailerTextView.setText("Watch Trailer");
-
         }
 
         public void launchYoutubeIntent(String url) {
 
             Intent youtubeIntent = new Intent(Intent.ACTION_VIEW);
-            youtubeIntent.setPackage("com.google.android.youtube");
+//            youtubeIntent.setPackage("com.google.android.youtube");
             youtubeIntent.setData(Uri.parse(url));
 
-            if (youtubeIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-
-                startActivity(youtubeIntent);
-            }
-
+            startActivity(youtubeIntent);
         }
 
         public void loadPosterImage() {
@@ -295,7 +313,6 @@ public class DetailActivity extends AppCompatActivity {
         public void onCreate(Bundle savedInstanceState) {
 
             super.onCreate(savedInstanceState);
-
         }
 
         @Override
@@ -311,8 +328,6 @@ public class DetailActivity extends AppCompatActivity {
             poster = (ImageView)view.findViewById(R.id.poster_image);
             movieReviewTextView = (TextView)view.findViewById(R.id.movie_review);
 
-            Log.i("textView text",movieTitleTextView.getText().toString());
-
             myKey = getString(R.string.api_key);
 
             Intent intent = getActivity().getIntent();
@@ -320,7 +335,7 @@ public class DetailActivity extends AppCompatActivity {
 
             if (arguments != null) {
                 movieId = arguments.getString("MOVIEID");
-                Log.i("movieId: ", movieId);
+
             }
             else if (arguments == null) {
 
@@ -338,30 +353,5 @@ public class DetailActivity extends AppCompatActivity {
 
             return view;
         }
-
-        @Override
-//        public boolean onCreateOptionsMenu(Menu menu) {
-//            super.onCreateOptionsMenu(menu, getMenuInflater());
-//            return true;
-//        }
-
-        public boolean onOptionsItemSelected(MenuItem item) {
-            // Handle action bar item clicks here. The action bar will
-            // automatically handle clicks on the Home/Up button, so long
-            // as you specify a parent activity in AndroidManifest.xml.
-            int id = item.getItemId();
-
-            //noinspection SimplifiableIfStatement
-            if (id == R.id.action_settings) {
-
-//                Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
-//                startActivity(i);
-                return false;
-            }
-
-            return super.onOptionsItemSelected(item);
-        }
-
-
     }
 }
