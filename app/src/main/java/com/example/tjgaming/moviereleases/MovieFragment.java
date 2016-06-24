@@ -5,8 +5,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +33,7 @@ import java.util.regex.Pattern;
  * A placeholder fragment containing a simple view.
  * // TODO: 6/15/2016 Create a DetailsActivity class and create a SettingsActivity class.
  */
-public class MovieFragment extends Fragment {
+public class MovieFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     //ArrayLists to store the id of the movie and to store the poster url of the movie
     private ArrayList<String> movieIdList = new ArrayList<String>();
@@ -61,8 +62,15 @@ public class MovieFragment extends Fragment {
     private String mKey;
     private Intent detailsIntent;
 
-    public MovieFragment() {
-        // Required empty public constructor
+    public MovieFragment() {}
+
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String mKey) {
+
+        ListPreference listPreference = (ListPreference) findPreference(getString(R.string.pref_sort_key));
+        listPreference.setSummary(getString(R.string.pref_sort_key));
+
     }
 
     @Override
@@ -70,6 +78,7 @@ public class MovieFragment extends Fragment {
 
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
     }
 
     public String getPoster(String movieId){
