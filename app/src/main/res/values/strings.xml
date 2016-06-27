@@ -3,7 +3,7 @@
     <string name="title_detail_activity">Movie Details</string>
     <string name="title_settings_activity">Settings</string>
     <string name="action_settings">Settings</string>
-    <string name="api_key">Enter API key here!</string>
+    <string name="api_key">API key here!</string>
 
     <string name="pref_sort_label">Sort Movies By</string>
     <string name="pref_popular_label">Popularity</string>

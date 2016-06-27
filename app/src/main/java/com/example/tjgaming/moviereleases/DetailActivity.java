@@ -278,27 +278,20 @@ public class DetailActivity extends AppCompatActivity {
         public void setTextViews() {
 
             movieTitleTextView.setText(movieTitle);
-
             movieReleaseDateTextView.setText(
                     "Release Date: " + movieReleaseDate);
-
             movieRatingTextView.setText(
                     "Rating: " + movieRating + "/10");
-
             movieOverviewTextView.setText(
                     "Overview: " + movieOverview);
-
             movieReviewTextView.setText(movieReview);
-
             movieTrailerTextView.setText("Watch Trailer");
         }
 
         public void launchYoutubeIntent(String url) {
 
             Intent youtubeIntent = new Intent(Intent.ACTION_VIEW);
-//            youtubeIntent.setPackage("com.google.android.youtube");
             youtubeIntent.setData(Uri.parse(url));
-
             startActivity(youtubeIntent);
         }
 
