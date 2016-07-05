@@ -19,7 +19,6 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -53,12 +52,19 @@ public class MovieFragment extends PreferenceFragment implements SharedPreferenc
     //Decides how the movies are sorted, either by popularity or by rating
     private String sortParameter = null;
 
-    int count = 0;
     private GridView mGridView;
+
     private String mKey;
+
     private Intent detailsIntent;
 
     public MovieFragment() {}
+
+    protected void onPostExecute(Void result) {
+        if (isAdded()) {
+            getResources().getString(R.string.app_name);
+        }
+    }
 
 
     @Override
@@ -73,9 +79,6 @@ public class MovieFragment extends PreferenceFragment implements SharedPreferenc
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         String sortPref = sharedPreferences.getString(getString(R.string.pref_sort_key),getString(R.string.pref_sort_popular));
-
-        //Unregister
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -86,46 +89,11 @@ public class MovieFragment extends PreferenceFragment implements SharedPreferenc
         setHasOptionsMenu(true);
     }
 
-    public String getPoster(String movieId){
 
-        String posterUrl = null;
-
-        try {
-            Uri.Builder builder = new Uri.Builder();
-            builder.scheme("http");
-            builder.authority(BASE_JSON_REQUEST);
-            builder.appendPath(JSON_REQUEST_PARAM);
-            builder.appendPath(MOVIE_JSON_REQUEST);
-            builder.appendPath(movieId);
-            builder.appendQueryParameter(API_KEY_PARAM, mKey);
-            String myUrl = builder.build().toString();
-
-            if(NetworkChecker.isNetworkActive(getActivity())){
-
-                GetMovieTask posterPathTask = new GetMovieTask();
-                String jsonData = posterPathTask
-                        .execute(myUrl)
-                        .get();
-                JSONObject jsonObject = new JSONObject(jsonData);
-                String posterPath = jsonObject.getString("poster_path");
-                posterUrl = BASE_POSTER_URL+POSTER_SIZE_PARAM+posterPath;
-            }
-        }
-        catch (InterruptedException e){
-            e.printStackTrace();
-        }
-        catch (ExecutionException e){
-            e.printStackTrace();
-        }
-        catch (JSONException e){
-            e.printStackTrace();
-        }
-        return posterUrl;
-    }
 
     public void getMovieDataFromApi(){
 
-        String movieData = null;
+        String movieData = "";
 
         try {
             if(NetworkChecker.isNetworkActive(getActivity())) {
@@ -152,6 +120,10 @@ public class MovieFragment extends PreferenceFragment implements SharedPreferenc
 
                     JSONObject jsonObject = moviesArray.getJSONObject(i);
                     movieIdList.add(jsonObject.getString("id"));
+
+                    String poster_path = (jsonObject.getString("poster_path"));
+                    String poster_url = BASE_POSTER_URL+POSTER_SIZE_PARAM+poster_path;
+                    posterUrlList.add(poster_url);
                 }
 
                 //creates new Movie objects that store movie id and poster url
@@ -160,9 +132,8 @@ public class MovieFragment extends PreferenceFragment implements SharedPreferenc
                     Movie movie = new Movie(movieId, poster);
                     movieId = movieIdList.get(i);
                     movie.setMovieId(movieId);
-                    poster = getPoster(movie.getMovieId());
+                    poster = posterUrlList.get(i);
                     movie.setMoviePosterUrl(poster);
-                    posterUrlList.add(movie.getMoviePosterUrl());
                 }
 
                 String[] postersArray = new String[posterUrlList.size()];
@@ -222,6 +193,7 @@ public class MovieFragment extends PreferenceFragment implements SharedPreferenc
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         String sortPref = sharedPreferences.getString(getString(R.string.pref_sort_key),getString(R.string.pref_sort_popular));
 
+
         if(sortPref.equals(getString(R.string.pref_sort_rating))){
 
             sortParameter = TOP_RATED_PARAM;
@@ -233,8 +205,6 @@ public class MovieFragment extends PreferenceFragment implements SharedPreferenc
             getMovieDataFromApi();
         }
 
-        //Unregister
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
         return v;
     }
 
